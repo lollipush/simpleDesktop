@@ -1,1 +1,2 @@
-simpleDesktop/.lock
+.gitignore
+simpleDesktop.xcodeproj/
