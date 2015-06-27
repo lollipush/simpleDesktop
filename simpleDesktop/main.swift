@@ -7,39 +7,43 @@
 //
 
 import Foundation
+import AppKit
 
 println("Hello, World!")
 
-func httpGet(surl: String) -> NSData {
-    let url = NSURL(string: surl)
-    let req = NSURLRequest(URL: url!)
-    var resp:NSURLResponse?
-    var err:NSError?
-    var data = NSURLConnection.sendSynchronousRequest(req, returningResponse: &resp, error: &err)
-    if err == nil{
-        //println(resp)
-        return data!
+
+
+class Http: NSObject {
+    static func get(surl: String) -> NSData {
+        let url = NSURL(string: surl)
+        let req = NSURLRequest(URL: url!)
+        var resp:NSURLResponse?
+        var err:NSError?
+        var data = NSURLConnection.sendSynchronousRequest(req, returningResponse: &resp, error: &err)
+        if err == nil{
+            //println(resp)
+            return data!
+        }
+        println(err)
+        return NSData()
     }
-    println(err)
-    return NSData()
+    
+    static func download(surl: String, path: String) -> Bool {
+        let data = get(surl)
+        return true
+    }
 }
 
 class ImageListReader: NSObject, NSXMLParserDelegate {
     override init() {
         super.init()
         
-        let htmlData = httpGet("http://simpledesktops.com/")
-        
+        let htmlData = Http.get("http://simpledesktops.com/")
         var err:NSError?
-        //println(NSXMLDocumentTidyXML)
         let xml = NSXMLDocument(data: htmlData, options: 1024, error: &err)
-        //println(xml)
-        
         let dom = NSXMLParser(data: xml!.XMLData)
         dom.delegate = self
-        println(dom.parse())
-        //println(dom)
-    }
+        println(dom.parse())    }
     
     func parserDidStartDocument(parser: NSXMLParser) {
         //println("parserDidStartDocument")
@@ -69,10 +73,18 @@ class ImageListReader: NSObject, NSXMLParserDelegate {
     func parser(parser: NSXMLParser, parseErrorOccurred parseError: NSError) {
         //println(parseError)
     }
-    
-    func parser(parser: NSXMLParser, validationErrorOccurred validationError: NSError) {
-        //println("sb")
+}
+
+class DesktopImageManager: NSObject {
+    func setImage(surl:String) -> Bool {
+        let mgr = NSWorkspace.sharedWorkspace()
+        let scr = NSScreen.mainScreen()
+        var opts = mgr.desktopImageOptionsForScreen(scr!)
+        var err:NSError?
+        let url = NSURL(fileURLWithPath: surl)
+        return mgr.setDesktopImageURL(url!, forScreen: scr!, options: nil, error: &err)
     }
 }
 
-ImageListReader()
+//ImageListReader()
+DesktopImageManager().setImage("/Users/monster/Desktop/soaring_mountains.png");
