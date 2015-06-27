@@ -118,7 +118,7 @@ class DesktopImageManager: NSObject {
 class Application: NSObject {
     static let lockFile = "./.lock"
     static let imageDir = "./image"
-    static let interval = 5;
+    static let interval: UInt32 = 5;
     let imageList: ImageListReader = ImageListReader()
     
     override init() {
